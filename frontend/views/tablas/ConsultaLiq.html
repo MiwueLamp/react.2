@@ -1,0 +1,140 @@
+//<script type="text/jsx">
+
+    function ConsultaLiq() {
+      const [hoveredRow, setHoveredRow] = useState(null);
+      const [dataSource, setDataSource] = useState([]);
+      useEffect(listarRegistros, []);
+      const history = useHistory();
+
+      function formatFecha(fecha) {
+        return fecha ? moment(fecha).format('DD/MM/YYYY') : '';
+      }
+
+      function listarRegistros() {
+        google.script.run
+          .withSuccessHandler(res => {
+            const usuarios = JSON.parse(res);
+            let arreglo = [];
+
+            usuarios.map(usuario => {
+              console.log(usuario)
+              arreglo.push({
+                key: usuario.ID,
+                ...usuario,
+                ACCIONES: (
+                  <Fragment>
+                  <Button
+                    onClick={() => {
+                      history.push("/Analista/RegistroUpdateLiq/" + usuario.ID);
+                      console.log(usuario.ID)
+                    }} className="bg-emerald-700 text-white m-auto">
+                    <EditOutlined />
+                  </Button>
+                  <Button
+                    onClick={() => { eliminarUsuario(usuario.ID)}} className="bg-red-500 text-white m-auto" type="danger">
+                    <DeleteOutlined />
+                  </Button>
+                </Fragment>
+                ),
+              });
+            });
+
+            setDataSource(arreglo);
+          })
+          .listarRegistros();
+      }
+      function eliminarUsuario(ID) {
+        const inputPassword = prompt('Ingrese la contraseña para confirmar la eliminación:');
+        if (inputPassword === "1234") {
+        google.script.run
+          .withSuccessHandler(({ titulo, descripcion }) => {
+            notificacionTareaTerminada(titulo, descripcion);
+            listarRegistros(); 
+          })
+          .withFailureHandler(error => {
+            console.error('Error al eliminar usuario:', error);
+            notificacionTareaTerminada("Ops ha ocurrido un error!", "Por favor, contacte a soporte.");
+          })
+          .eliminarUsuario(ID);
+        } else {
+          alert('Contraseña incorrecta. Eliminación cancelada.');
+        }
+      }
+      
+      return (
+      <div className="flex flex-col h-screen items-center justify-center"  >
+        <h1 className="text-3xl font-bold mt-8 pb-4 text-center sticky top-0 bg-white z-10">TABLA CONSULTA LIQUIDACIONES</h1>  
+        <div className="w-11/12 flex-1 overflow-x-auto ">
+          <div className="relative">
+            <table className="table-fixed w-full ">
+
+              <thead className=" sticky top-0 z-10 bg-gray-100 border-2 border-neutral-500" >
+                <tr className="border-b-2 border-neutral-500">
+                  {/* Las primeras cuatro columnas fijas */}
+                  <th className="sticky left-0 bg-gray-100 p-4 w-40 border-b-2 border-neutral-500 mb-4">NOMBRE</th>
+                  <th className="sticky  left-40 bg-gray-100 p-4 w-40 border-r-2 border-b-2 border-neutral-500 mb-4">CEDULA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">TIPO</th>
+                  {/* El resto de las columnas scroll */}
+                  <th className="p-4 w-80 border-b-2 border-neutral-500 mb-4">RADICADO</th>
+                  <th className="p-4 w-80 border-b-2 border-neutral-500 mb-4">LINK DEL JUZGADO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">CIUDAD</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">ESTADO DE APERTURA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">FECHA DE APERTURA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">NOMBRE DEL LIQUIDADOR</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">LIQUIDADOR CORREO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">LIQUIDADOR TELEFONO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">LIQUIDADOR DIRECCION</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">LIQUIDADOR HONORARIOS</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">ESTADO LIQUIDADOR</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">ETAPAS DEL PROCESO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">FECHA DE AUDIENCIA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">COMENTARIO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">FECHA DE COMENTARIO</th>
+                  {/* La última columna fija */}
+                  <th className="sticky right-0 bg-gray-100 py-4 px-2 w-32 border-b-2 border-neutral-500">ACCIONES</th>
+                </tr>
+              </thead>
+
+              <tbody className="overflow-y-auto border-2 border-neutral-500">
+              {dataSource.map((usuario, index) => (
+                <tr 
+                key={usuario.key} 
+                className={index === hoveredRow ? 'bg-cyan-100' : index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
+                  onMouseEnter={() => setHoveredRow(index)}
+                  onMouseLeave={() => setHoveredRow(null)}>
+                  
+                  <td className="sticky top-0 left-0 p-2 sm:w-40 md:w-80 lg:w-40  bg-gray-100">{usuario.NOMBRE}</td>
+                  <td className="sticky top-0 left-40  p-2 sm:w-40 md:w-80 lg:w-40 border-r-2 border-neutral-500 text-center  bg-gray-100">{usuario.CEDULA}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.TIPO}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.RADICADO}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center truncate ">  
+                  <a href={usuario["LINK DEL JUZGADO"]} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    {usuario["LINK DEL JUZGADO"]}
+                  </a></td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.CIUDAD}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`ESTADO DE APERTURA`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{formatFecha(usuario[`FECHA DE APERTURA`])}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`NOMBRE DEL LIQUIDADOR`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`LIQUIDADOR CORREO`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`LIQUIDADOR TELEFONO`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`LIQUIDADOR DIRECCION`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`LIQUIDADOR HONORARIOS`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`ESTADO LIQUIDADOR`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`ETAPAS DEL PROCESO`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{formatFecha(usuario[`FECHA DE AUDIENCIA`])}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.COMENTARIO}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{formatFecha(usuario[`FECHA DE COMENTARIO`])}</td>
+
+                  <td className="sticky top-0 right-0 p-2 w-32  bg-gray-100 border-x-2 border-neutral-500">{usuario.ACCIONES}</td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  );
+    };
+
+
+//</script>

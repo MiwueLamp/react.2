@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?!= include('frontend/config/cdn') ?>
+</head>
+
+<body>
+  <div id="root"></div>
+</body>
+
+<components style="display:none;">
+  <!-----------------------importaciones-------------->
+  <!-- helpers -->
+  <?!= include('frontend/helpers/modalesNotificaciones') ?>
+
+<?!= include('frontend/config/constantesCdn') ?>
+  <!-----------------------vistas-------------->
+  <?!= include('frontend/views/Inicio') ?>
+  <?!= include('frontend/views/Analista') ?>
+  <?!= include('frontend/views/GenerarDocs') ?>
+  <?!= include('frontend/views/Default') ?>
+
+    <!-----------------------modulos generarDocs GESTION JURIDICA-------------->  
+    <?!= include('frontend/views/plantillasDocs/SolicitudAdmisionAcredor') ?>
+    <?!= include('frontend/views/plantillasDocs/SolicitudVigilancia') ?>
+    <?!= include('frontend/views/plantillasDocs/liquidacionSolicitudPagador') ?>
+    <?!= include('frontend/views/plantillasDocs/AdmisionMemorialJuzgadoMedida') ?>
+    <?!= include('frontend/views/plantillasDocs/DerechoDePeticionPagador') ?>
+    <?!= include('frontend/views/plantillasDocs/MemorialJuzMedida') ?>
+    <?!= include('frontend/views/plantillasDocs/JuzLiquidacion') ?>
+    <?!= include('frontend/views/plantillasDocs/LiquidacionSolAcredor') ?>
+    <!-----------------------modulos generarDocs GERENCIA-------------->  
+    <?!= include('frontend/views/plantillasDocs/gerencia/ConsentimientoInsolvencia') ?>
+
+  <!-----------------------modulos analista-------------->  
+  <?!= include('frontend/views/formularios/RegistroLiq') ?>
+  <?!= include('frontend/views/tablas/ConsultaLiq') ?>
+  <?!= include('frontend/views/formularios/RegistroUpdateLiq') ?>
+
+  <?!= include('frontend/views/formularios/RegistroJur') ?>
+  <?!= include('frontend/views/formularios/RegistroUpdateJur') ?>
+  <?!= include('frontend/views/tablas/ConsultaJur') ?>
+
+  <?!= include('frontend/views/formularios/controlEmbLib/ActualizaEmbLib') ?>
+  <?!= include('frontend/views/formularios/controlEmbLib/RegistroEmbLib') ?>
+  <?!= include('frontend/views/tablas/tablaEmbLib/TablaEmbLib') ?>
+
+
+
+
+
+
+
+  <!-----------------------rutas-------------->
+  <?!= include('frontend/routes/Routes') ?>
+
+  <!-----------------------Vistas-------------->
+<?!= include('frontend/App') ?>
+
+
+</components>
+
+</html>

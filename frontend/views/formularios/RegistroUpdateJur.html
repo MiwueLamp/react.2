@@ -1,0 +1,214 @@
+//<script type="text/jsx">
+function RegistroUpdateJur() {
+
+  const [form] = Form.useForm();
+  const { ID } = useParams();
+  const [initialValues, setInitialValues] = useState(undefined);
+  const [link, setLink] = useState();
+  const history = useHistory();
+
+    useEffect(() => {
+      if (ID) {
+        console.log("lo que entra en useffect",ID)
+        google.script.run
+          .withSuccessHandler(res => {
+            const usuario = JSON.parse(res);
+            if (usuario["FECHA DE COMENTARIO"] && usuario["FECHA DE COMENTARIO"].trim() !== "") {
+              usuario["FECHA DE COMENTARIO"] = moment(usuario["FECHA DE COMENTARIO"]).format('DD/MM/YYYY');
+            }
+            setInitialValues(usuario);
+            if (usuario["LINK DEL JUZGADO"] !== "") {
+              setLink(usuario["LINK DEL JUZGADO"]);
+            }
+            setInitialValues(usuario);
+            console.log("elegidos como valores" + usuario);
+            console.log("elegidos como valores" + usuario);
+          }).withFailureHandler(error => {
+            console.error("Error en la función remota:", error);
+          })
+          .listarRegistrosJur(parseInt(ID));
+      }
+    }, [])
+
+
+    const guardarFormularioJur = (datosFormulario) => {
+
+      notificacionGuardando("Guardando usuario");
+      if (ID) {
+        console.log(ID)
+        console.log(typeof ID)
+
+        google.script.run
+          .withSuccessHandler(({ titulo, descripcion }) => {
+            notificacionTareaTerminada(titulo, descripcion);
+            setInitialValues(undefined);
+            form.resetFields();
+            history.push("/Analista/ConsultaJur");
+          }).actualizarUsuarioJur(parseInt(ID), JSON.stringify(datosFormulario));
+      } else {
+        const ID = v4();
+  
+        google.script.run
+          .withSuccessHandler(({ titulo, descripcion }) => {
+            notificacionTareaTerminada(titulo, descripcion);
+            form.resetFields();
+          }).guardarUserJur(JSON.stringify({ ID, ...datosFormulario }));
+      }
+    }
+
+    const Formulario = () => {
+      if (!initialValues) {
+        return ""; // Otra lógica o mensaje de carga mientras se obtienen los datos
+      }
+    return (
+      <Form initialValues={initialValues || "" } form={form} onFinish={guardarFormularioJur}  layout="vertical" >
+        
+        <div className="flex" id="primerConten">
+
+          <div className=" shadow-xl border-slate-300 flex flex-col w-2/5 mx-4 mb-4 bg-gray-100 px-4" id="segundoConten">
+            <div className="flex-grow  p-2" id="nombre">
+              <Item name="NOMBRE" label="NOMBRE" className="font-bold" >
+                <Input />
+              </Item>
+            </div>
+            <div className="flex-grow  p-2" id="cedula">
+              <Item name="CEDULA" label="CEDULA"  className="font-bold">
+                <Input />
+              </Item>
+            </div>
+            <div className="flex-grow p-2"id="tipo">
+              <Item name="TIPO" label="TIPO"  className="font-bold">
+                <Select>
+                  <Option value="PAGO">PAGO</Option>
+                  <Option value="PENDIENTE">PENDIENTE</Option>
+                  <Option value="MORA">MORA</Option>
+                  <Option value=""></Option>
+                </Select>
+              </Item>
+            </div>
+          </div>
+          <div className="shadow-xl border-slate-300 flex w-3/5 mx-3.5 mb-4 bg-gray-100 px-4" id="segundoConten">
+
+            <div className="flex-grow  p-2" id="comentario">
+            <Item
+              name="COMENTARIO"
+              label="COMENTARIO" 
+              className="font-bold">
+              <TextArea rows={5} maxLength={400} />
+            </Item>
+            <Item name="TIPO DE PROCESO" label="TIPO DE PROCESO"  className="font-bold">
+                <Select>
+                  <Option value="OBJECIONES">OBJECIONES</Option>
+                  <Option value="PROCESOS EJECUTIVOS">PROCESOS EJECUTIVOS</Option>
+                  <Option value=""></Option>
+                </Select>
+              </Item>
+            </div>
+            <div className="flex-grow  p-2" id="fechaCom">
+            <Item
+              name="FECHA DE COMENTARIO"
+              label="FECHA DE COMENTARIO"
+              className="font-bold" >
+              <Input placeholder="DD/MM/YYYY"></Input>
+            </Item>
+              <div className="flex-grow " id="estapa">
+                <Item
+                  name="ETAPA"
+                  label="ETAPA"
+                  className="font-bold"
+                  rules={[
+                    { required: false}
+                  ]}>
+                <Select>
+                      <Option value="APERTURADO">APERTURADO</Option>
+                      <Option value="RECHAZADO">RECHAZADO</Option>
+                      <Option value="OBJECIONES">OBJECIONES</Option>
+                      <Option value="INADMITIDO">INADMITIDO</Option>
+                      <Option value="CARGA PROCESAL">CARGA PROCESAL</Option>
+                      <Option value="RECURSO">RECURSO</Option>
+                      <Option value="TUTELA">TUTELA</Option>
+                      <Option value=""></Option>
+                </Select>
+                </Item>
+              </div>
+              <Item
+              name="FECHA DE AUDIENCIA"
+              label="FECHA DE AUDIENCIA"
+              className="font-bold" >
+              <Input placeholder="DD/MM/YYYY"></Input>
+            </Item>
+            </div>
+            
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+        
+        <div className="flex-col shadow-xl mx-4 " id="primerConten ">        
+          <div className="  border-slate-300 flex  bg-gray-100 px-4" id="cuartoConten">
+
+          </div>
+          <div className="  border-slate-300 flex   bg-gray-100 px-4" id="quitoConten">
+            <div className="flex-grow  p-2" id="radicado">
+              <Item
+                name="RADICADO"
+                label="RADICADO"
+                className="font-bold">
+                <Input />
+              </Item>
+            </div>
+            <div className="flex-grow p-2 "id="link">
+              <Item
+                name="LINK DEL JUZGADO"
+                label="LINK DEL JUZGADO"
+                className="font-bold"
+                rules={[
+                  { type: "url"},
+                  { required: false}
+                ]}
+              >
+                <Input />
+              </Item>
+            </div>
+            <div className="flex-grow  p-2" id="ciudad">
+                <Item
+                  name="CIUDAD"
+                  label="CIUDAD"
+                  className="font-bold">
+                  <Input />
+                </Item>
+            </div>
+          </div>
+        </div>  
+          <div className="flex items-center justify-between bg-sky-700 mx-4 my-8">
+              <button className="text-center text-2xl font-bold  text-white bg-rose-500 px-8 py-4" type="submit">Guardar</button>
+          </div>
+      </Form>
+    )
+  }
+  return (
+    <div className=" w-9/12 border-spacing-4 mx-auto">
+                <div className="flex items-center justify-between bg-sky-700 mb-6 mx-4">
+                  <h2 className="text-2xl font-bold text-white px-8">SEGUIMIENTO JURIDICO</h2>
+                  <a href={link} target="_blank" rel="noopener noreferrer" >
+                  <h2 className="text-2xl font-bold text-white py-4 bg-rose-500 px-8">CONSULTAR</h2>
+                  </a>
+              </div>
+      {
+        (ID && initialValues)
+          ? <Formulario />
+          : <Formulario />
+      }
+    </div>
+  )
+}
+
+
+//</script>

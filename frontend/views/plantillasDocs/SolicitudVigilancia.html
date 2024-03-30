@@ -1,0 +1,305 @@
+//<script type="text/jsx">
+
+function SolicitudVigilancia () {
+    const initialFormData = {
+        nombreCSeccional: "",
+        correoCPresidencia: "",
+        correoCSecretaria: "",
+        nombreJuzgado: "",
+        demandante: "",
+        infoDemandante: "",
+        nombreCliente: "",
+        cedulaCliente: "",
+        lugarExpe: "",
+        nombreOperador: "",
+        operador: "",
+        radicadoInsolvencia: "",
+        fechaPresentacionInsolvencia: "",
+        fechaAuto: "",
+        fechaSuspencion: "",
+        nombreCConciliacion: "",
+        radicadoProceso: "",
+        mesesSolicitud: "",
+        fechaPresentacionSolicitud: "",
+        referencia: "",
+        demandado: "",
+        infoDemandado: "",
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
+    const [documentLink, setDocumentLink] = useState(null);
+    const [showLinkDiv, setShowLinkDiv] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [documentId, setDocumentId] = useState(null);
+    const history = useHistory();
+    const [loading, setLoading] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+
+    const handleGenerarDocClick = () => {
+        console.log("enviando datos en el servidor:", formData);
+        setLoading(true); // Activa la animación
+        google.script.run
+            .withSuccessHandler(response => {
+                console.log("Respuesta del servidor:", response);
+                if (response.success && response.documentId) {
+                    setDocumentId(response.documentId); // Almacena el ID en el estado local
+                    setDocumentLink(response.documentLink); // Almacena la URL en el estado local
+                    setShowLinkDiv(true);
+                }
+                setLoading(false); // Desactiva la animación después de recibir la respuesta
+            })
+            .withFailureHandler(error => {
+                console.error("Error en la comunicación con el servidor:", error);
+                setLoading(false); // Desactiva la animación después de recibir la respuesta
+            })
+            .enviarDatosVigilancia(formData);
+    };
+
+    const handleCerrarClick = () => {
+        // Restablecer los valores de los inputs utilizando el DOM
+        document.getElementById("nombreCSeccional").value = "";
+        document.getElementById("correoCPresidencia").value = "";
+        document.getElementById("correoCSecretaria").value = "";
+        document.getElementById("nombreJuzgado").value = "";
+        document.getElementById("demandante").value = "";
+        document.getElementById("infoDemandante").value = "";
+        document.getElementById("nombreCliente").value = "";
+        document.getElementById("cedulaCliente").value = "";
+        document.getElementById("lugarExpe").value = "";
+        document.getElementById("nombreOperador").value = "";
+        document.getElementById("operador").value = "";
+        document.getElementById("radicadoInsolvencia").value = "";  
+        document.getElementById("fechaPresentacionInsolvencia").value = "";  
+        document.getElementById("fechaAuto").value = "";  
+        document.getElementById("fechaSuspencion").value = "";  
+        document.getElementById("nombreCConciliacion").value = "";  
+        document.getElementById("radicadoProceso").value = "";  
+        document.getElementById("mesesSolicitud").value = "";  
+        document.getElementById("fechaPresentacionSolicitud").value = ""; 
+        document.getElementById("referencia").value = ""; 
+        document.getElementById("demandado").value = ""; 
+        document.getElementById("infoDemandado").value = ""; 
+        setShowLinkDiv(false);
+    };
+
+    const handleGenerarPDFClick = () => {
+        // Asegúrate de que documentId tenga un valor antes de enviar la solicitud
+        if (!documentId) {
+            console.error("No se encontró el ID del documento. Asegúrate de generar el documento primero."+ documentId);
+            setErrorMessage("No se encontró el ID del documento. Asegúrate de generar el documento primero.");
+            return;
+        }
+    console.log(documentId)
+        google.script.run
+            .withSuccessHandler(response => {
+                console.log("Respuesta del servidor:", response);
+                if (response.success) {
+                    setShowSuccessAlert(true);
+
+                    setTimeout(() => {
+                        setShowSuccessAlert(false);
+                        history.push("/GenerarDocs/Default");
+                    }, 6000);
+                } else {
+                    setErrorMessage(response.message);
+                }
+            })
+            .withFailureHandler(error => {
+                console.error("Error en la comunicación con el servidor:", error);
+                setErrorMessage("Error en la comunicación con el servidor.");
+            })
+            .generarPDFVigilancia({
+                ...formData,
+                documentId: documentId
+            });
+    };
+
+    return (
+    <div className=" w-9/12 border-spacing-4 mx-auto">
+        <div className="flex items-center justify-between bg-sky-300 mb-4 ">
+        <h2 className="text-2xl font-bold text-black px-8">SOLICITUD DE VIGILANCIA</h2>
+        <h2 className="text-2xl font-bold text-white py-4 bg-rose-600 px-8" onClick={handleGenerarDocClick}>GENERAR DOC</h2>
+        </div>
+            <form className="w-full bg-white p-8 rounded shadow-md border">
+
+            <div className="grid grid-cols-3 gap-4 mb-4 ">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE CONSEJO SECCIONAL</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md"  onChange={(e) => setFormData({ ...formData, nombreCSeccional: e.target.value })} id="nombreCSeccional"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">CORREO PRESIDENCIA</label>
+                    <input type="email" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, correoCPresidencia: e.target.value })} id="correoCPresidencia"  placeholder="Consejo Seccional"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">CORREO SECRETARÍA</label>
+                    <input type="email" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, correoCSecretaria: e.target.value })} id="correoCSecretaria" placeholder="Consejo Seccional"/>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE JUZGADO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreJuzgado: e.target.value })} id="nombreJuzgado" placeholder="En donde esta el proceso"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">DEMANDANTE</label>
+                    <select className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, demandante : e.target.value })}  id="demandante">
+                        <option value=""></option>
+                        <option value="Demandantes">Demandantes</option>
+                        <option value="Demandante">Demandante</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE NIT Y/O DOC DEMANDANTE</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, infoDemandante: e.target.value })} id="infoDemandante" placeholder="demandante-nit;demandante-cedula"/>
+                </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div>
+                    <label className="block text-sm font-medium text-gray-700">DEMANDADO</label>
+                    <select className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, demandado : e.target.value })}  id="demandado">
+                        <option value=""></option>
+                        <option value="Demandados">Demandados</option>
+                        <option value="Demandado">Demandado</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE NIT Y/O DOC DEMANDADO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, infoDemandado: e.target.value })} id="infoDemandado" placeholder="demandado-nit;demandado-cedula"/>
+                </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE CLIENTE</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreCliente: e.target.value })} id="nombreCliente"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">CEDULA CLIENTE</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, cedulaCliente: e.target.value })} id="cedulaCliente"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">LUGAR DE EXPEDICIÓN</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, lugarExpe: e.target.value })} id="lugarExpe"/>
+                </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE OPERADOR </label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreOperador: e.target.value })} id="nombreOperador" placeholder="Insolvencia"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">OPERADOR</label>
+                    <select className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, operador : e.target.value })}  id="operador">
+                        <option value=""></option>
+                        <option value="identificado">la operadora</option>
+                        <option value="identificada">el operador</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700"># RADICADO INSOLVENCIA</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, radicadoInsolvencia: e.target.value })} id="radicadoInsolvencia"/>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-4 mt-5">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">FECHA PRESENTACIÓN INSOLVENCIA</label>
+                    <input type="date" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, fechaPresentacionInsolvencia: e.target.value })} id="fechaPresentacionInsolvencia" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">FECHA AUTO ADMISIÓN</label>
+                    <input type="date" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, fechaAuto: e.target.value })} id="fechaAuto"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">FECHA SOLICITUD SUSPENSIÓN</label>
+                    <input type="date" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, fechaSuspencion: e.target.value })} id="fechaSuspencion"/>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE C.CONCILIACIÓN</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreCConciliacion: e.target.value })} id="nombreCConciliacion"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700"># RADICADO PROCESO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, radicadoProceso: e.target.value })} id="radicadoProceso"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">MESES SOLICITUD</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, mesesSolicitud: e.target.value })} id="mesesSolicitud" placeholder="Eje: un mes, dos meses , etc."/>
+                </div>
+            </div>
+            <div>
+                    <label className="block text-sm font-medium text-gray-700">FECHA PRESENTACIÓN SOLICITUD</label>
+                    <input type="date" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, fechaPresentacionSolicitud: e.target.value })} id="fechaPresentacionSolicitud" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">REFERENCIA</label>
+                    <select className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, referencia : e.target.value })}  id="referencia">
+                        <option value=""></option>
+                        <option value="PROCESO EJECUTIVO">PROCESO EJECUTIVO</option>
+                        <option value="PROCESO DE LIQUIDACIÓN DE PERSONA NATURAL NO COMERCIANTE">PROCESO DE LIQUIDACIÓN DE PERSONA NATURAL NO COMERCIANTE</option>
+                    </select>
+                </div>
+        </form>
+
+        {showLinkDiv && (
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-700 bg-opacity-75 flex items-center justify-center">
+            <div className="bg-white p-8 rounded shadow-md border w-1/2 h-auto">
+                <p className="text-2xl font-bold mb-4 text-center text-gray-800">TU DOCUMENTO SE GENERÓ CON ÉXITO</p>
+                <p className="mb-4 text-gray-700">
+                    Recuerda que falta insertar:
+                    <br />
+                    - La firma del cliente
+                </p>
+                <p className="text-gray-700">
+                Para finalizar con la edición, abre el documento e inserta las imágenes. Luego puedes volver para generar el PDF.
+                </p>
+                <div className="flex justify-around items-center mt-4">
+                    <a href={documentLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline mr-4 font-bold">Abrir Documento</a>
+                    <button onClick={handleGenerarPDFClick} className="px-4 py-2 bg-emerald-800 text-white rounded-md font-bold">Generar PDF</button>
+                    <button onClick={handleCerrarClick} className="px-4 py-2 bg-red-600 text-white rounded-md font-bold">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        )}
+
+        {showSuccessAlert && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong className="font-bold">Éxito!</strong>
+            <span className="block sm:inline tex"> PDF creado. Consulta tu bandeja de borradores.</span>
+            </div>
+        )}
+
+        {errorMessage && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-48" role="alert">
+                <strong className="font-bold">Error!</strong>
+                <span className="block sm:inline text-gray-800"> {errorMessage}</span>
+                </div>
+            )}
+            {loading && (
+                <div className="fixed top-0 left-0 w-full h-full bg-gray-700 bg-opacity-75 flex items-center justify-center">
+    <div className="bg-white p-8 rounded shadow-md border w-1/2 h-auto flex flex-col items-center justify-center">
+            {/* Ícono de serpiente */}
+            <div className="rounded-full h-20 w-20 bg-fuchsia-100 animate-ping mb-4">
+                {/* Reemplaza con tu SVG de serpiente */}
+                <svg className="h-full w-full text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 10l3 3-3 3"></path>
+                    <path d="M19 16v-2a7 7 0 00-14 0v2"></path>
+                </svg>
+            </div>
+
+            {/* Texto */}
+            <span className="text-2xl font-bold text-gray-800">CREANDO DOC ...</span>
+        </div>
+    </div>
+        )}
+    </div>
+    )
+}
+
+
+//</script>

@@ -1,0 +1,126 @@
+//<script type="text/jsx">
+
+    function ConsultaJur() {
+      const [hoveredRow, setHoveredRow] = useState(null);
+      const [dataSource, setDataSource] = useState([]);
+      useEffect(listarRegistrosJur, []);
+      const history = useHistory();
+
+      function formatFecha(fecha) {
+        return fecha ? moment(fecha).format('DD/MM/YYYY') : '';
+      }
+
+      function listarRegistrosJur() {
+        google.script.run
+          .withSuccessHandler(res => {
+            const usuarios = JSON.parse(res);
+            let arreglo = [];
+
+            usuarios.map(usuario => {
+              console.log(usuario)
+              arreglo.push({
+                key: usuario.ID,
+                ...usuario,
+                ACCIONES: (
+                  <Fragment>
+                  <Button
+                    onClick={() => {
+                      history.push("/Analista/RegistroUpdateJur/" + usuario.ID);
+                      console.log(usuario.ID)
+                    }} className="bg-emerald-700 text-white m-auto">
+                    <EditOutlined />
+                  </Button>
+                  <Button
+                    onClick={() => { eliminarUsuarioJur(usuario.ID)}} className="bg-red-500 text-white m-auto" type="danger">
+                    <DeleteOutlined />
+                  </Button>
+                </Fragment>
+                ),
+              });
+            });
+
+            setDataSource(arreglo);
+          })
+          .listarRegistrosJur();
+      }
+      function eliminarUsuarioJur(ID) {
+        const inputPassword = prompt('Ingrese la contraseña para confirmar la eliminación:');
+        if (inputPassword === "1234") {
+        google.script.run
+          .withSuccessHandler(({ titulo, descripcion }) => {
+            notificacionTareaTerminada(titulo, descripcion);
+            listarRegistrosJur(); 
+          })
+          .withFailureHandler(error => {
+            console.error('Error al eliminar usuario:', error);
+            notificacionTareaTerminada("Ops ha ocurrido un error!", "Por favor, contacte a soporte.");
+          })
+          .eliminarUsuarioJur(ID);
+        } else {
+          alert('Contraseña incorrecta. Eliminación cancelada.');
+        }
+      }
+      
+      return (
+      <div className="flex flex-col h-screen items-center justify-center"  >
+        <h1 className="text-3xl font-bold mt-8 pb-4 text-center sticky top-0 bg-white z-10">TABLA CONSULTA JURIDICA</h1>  
+        <div className="w-11/12 flex-1 overflow-x-auto ">
+          <div className="relative">
+            <table className="table-fixed w-full ">
+
+              <thead className=" sticky top-0 z-10 bg-blue-50 border-2 border-neutral-500" >
+                <tr className="border-b-2 border-neutral-500">
+                  {/* Las primeras cuatro columnas fijas */}
+                  <th className="sticky left-0 bg-blue-50 p-4 w-40 border-b-2 border-neutral-500 mb-4">NOMBRE</th>
+                  <th className="sticky  left-40 bg-blue-50 p-4 w-40 border-r-2 border-b-2 border-neutral-500 mb-4">CEDULA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">TIPO</th>
+                  {/* El resto de las columnas scroll */}
+                  <th className="p-4 w-80 border-b-2 border-neutral-500 mb-4">RADICADO</th>
+                  <th className="p-4 w-80 border-b-2 border-neutral-500 mb-4">LINK DEL JUZGADO</th>
+                  <th className="p-4 w-80 border-b-2 border-neutral-500 mb-4">TIPO DE PROCESO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">CIUDAD</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">ETAPA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">FECHA DE AUDIENCIA</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">COMENTARIO</th>
+                  <th className="p-4 w-40 border-b-2 border-neutral-500 mb-4">FECHA DE COMENTARIO</th>
+                  {/* La última columna fija */}
+                  <th className="sticky right-0 bg-blue-50 py-4 px-2 w-32 border-b-2 border-neutral-500">ACCIONES</th>
+                </tr>
+              </thead>
+
+              <tbody className="overflow-y-auto border-2 border-neutral-500">
+              {dataSource.map((usuario, index) => (
+                <tr 
+                key={usuario.key} 
+                className={index === hoveredRow ? 'bg-stone-100' : index % 2 === 0 ? 'bg-blue-50' : 'bg-white'}
+                  onMouseEnter={() => setHoveredRow(index)}
+                  onMouseLeave={() => setHoveredRow(null)}>
+                  
+                  <td className="sticky top-0 left-0 p-2 sm:w-40 md:w-80 lg:w-40  bg-blue-50">{usuario.NOMBRE}</td>
+                  <td className="sticky top-0 left-40  p-2 sm:w-40 md:w-80 lg:w-40 border-r-2 border-neutral-500 text-center bg-blue-50">{usuario.CEDULA}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.TIPO}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.RADICADO}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center truncate ">  
+                  <a href={usuario["LINK DEL JUZGADO"]} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    {usuario["LINK DEL JUZGADO"]}
+                  </a></td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario["TIPO DE PROCESO"]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.CIUDAD}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario[`ETAPA`]}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{formatFecha(usuario[`FECHA DE AUDIENCIA`])}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{usuario.COMENTARIO}</td>
+                  <td className="p-2 sm:w-40 md:w-80 lg:w-40 text-center ">{formatFecha(usuario[`FECHA DE COMENTARIO`])}</td>
+
+                  <td className="sticky top-0 z-10 right-0 p-2 w-32 bg-blue-50 border-x-2 border-neutral-500">{usuario.ACCIONES}</td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  );
+    };
+
+
+//</script>

@@ -1,0 +1,58 @@
+//<script type="text/jsx">
+
+  function Analista() {
+    
+      return (
+        <div>
+          <div className="flex items-center justify-between  bg-blue-950 p-6 mb-6">
+                  <h2 className="text-5xl font-bold text-white"><Link to="/">AtriAPP</Link></h2>
+                  <h2 className="text-5xl font-bold text-white">Analista</h2>
+              </div>
+              <div className="flex justify-end space-x-4 p-4 mb-10">
+                  <div className="relative group">
+                      <button className=" bg-sky-200 text-black px-4 py-2 rounded-md focus:outline-none font-bold hover:bg-sky-200">LIQUIDACION</button>
+                      <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-full z-40">
+                          <Link to="/Analista/RegistroLiq"><span href="#" className="block px-4 py-2 hover:font-bold hover:bg-blue-200">REGISTRO</span></Link>
+                          <Link to="/Analista/ConsultaLiq"><span href="#" className="block px-4 py-2 hover:font-bold hover:bg-blue-200">CONSULTA</span></Link>
+                      </div>
+                  </div>
+                  <div className="relative group">
+                      <button className="bg-indigo-200 text-black px-4 py-2 rounded-md focus:outline-none font-bold hover:bg-indigo-300">PROCESOS JURIDICOS</button>
+                      <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-full z-40">
+                        <Link to="/Analista/RegistroJur"><span href="#" className="block px-4 py-2 hover:font-bold hover:bg-indigo-300">REGISTRO</span></Link>
+                        <Link to="/Analista/ConsultaJur"><span href="#" className="block px-4 py-2 hover:font-bold hover:bg-indigo-300">CONSULTA</span></Link>
+                        
+                      </div>
+                  </div>
+                  <div className="relative group">
+                      <button className="bg-indigo-200 text-black px-4 py-2 rounded-md focus:outline-none font-bold hover:bg-indigo-300">CONTROL EMBARGOS Y LIBRANZAS</button>
+                      <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-full z-40">
+                        <Link to="/Analista/RegistroEmbLib"><span href="#" className="block px-4 py-2 hover:font-bold hover:bg-indigo-300">REGISTRO PROCESO</span></Link>
+                        <Link to="/Analista/ConsultaJur"><span href="#" className="block px-4 py-2 hover:font-bold hover:bg-indigo-300">CONSULTA CONTROL</span></Link>
+                        
+                      </div>
+                  </div>
+              </div>
+              <div id="contenido-analista" className="p-4">
+                    <Route exact path="/Analista/Default" component={Default} />
+                    <Route exact path="/Analista/RegistroLiq" component={RegistroLiq} />
+                    <Route exact path="/Analista/ConsultaLiq" component={ConsultaLiq} />
+                    <Route exact path="/Analista/RegistroJur" component={RegistroJur} />
+                    <Route exact path="/Analista/ConsultaJur" component={ConsultaJur} />
+                    <Route exact path="/Analista/RegistroEmbLib" component={RegistroEmbLib} />
+                    <Route exact path="/Analista/ActualizaEmbLib" component={RegistroUpdateJur} />
+
+
+                    <div id="contenido-edicion" className="p-4">
+                    <Route exact path="/Analista/RegistroUpdateLiq/:ID?" component={RegistroUpdateLiq} />
+                    <Route exact path="/Analista/RegistroUpdateJur/:ID?" component={RegistroUpdateJur} />
+                    <Route exact path="/Analista/TablaEmbLib/:ID?" component={ConsultaJur} />
+                    </div>
+                    <Redirect from="*" to="/Analista/Default" />
+                </div>
+                
+        </div>
+        
+      );
+      };
+  //</script>

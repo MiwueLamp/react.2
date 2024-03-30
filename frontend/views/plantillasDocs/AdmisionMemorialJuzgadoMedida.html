@@ -1,0 +1,252 @@
+//<script type="text/jsx">
+
+function AdmisionMemorialJuzgadoMedida () {
+    const initialFormData = {
+
+        nombreJuzgado: "",
+        CorreoJuzgado: "",
+        nombreDemandante: "",
+
+        nombreDemandados:"",
+
+        nombreCliente: "",
+        cedulaCliente: "",
+        lugarExpe: "",
+
+        radicadoProceso: "",
+        identificado: "",
+        fechaPresentacion: "",
+
+        nombreCConciliacion: "",
+        fechaAuto: "",
+        radicadoAuto: "",
+
+        nombrePagador: "",
+        
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
+    const [documentLink, setDocumentLink] = useState(null);
+    const [showLinkDiv, setShowLinkDiv] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [documentId, setDocumentId] = useState(null);
+    const history = useHistory();
+    const [loading, setLoading] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+
+    const handleGenerarDocClick = () => {
+        console.log("enviando datos en el servidor:", formData);
+        setLoading(true); // Activa la animación
+        google.script.run
+            .withSuccessHandler(response => {
+                console.log("Respuesta del servidor:", response);
+                if (response.success && response.documentId) {
+                    setDocumentId(response.documentId); // Almacena el ID en el estado local
+                    setDocumentLink(response.documentLink); // Almacena la URL en el estado local
+                    setShowLinkDiv(true);
+                }
+                setLoading(false); // Desactiva la animación después de recibir la respuesta
+            })
+            .withFailureHandler(error => {
+                console.error("Error en la comunicación con el servidor:", error);
+                setLoading(false); // Desactiva la animación después de recibir la respuesta
+            })
+            .enviarAdmisMemoJuzMedida(formData);
+    };
+
+    const handleCerrarClick = () => {
+        // Restablecer los valores de los inputs utilizando el DOM
+        document.getElementById("nombreJuzgado").value = "";
+        document.getElementById("CorreoJuzgado").value = "";
+        document.getElementById("nombreDemandante").value = "";
+
+        document.getElementById("nombreDemandados").value = "";
+
+        document.getElementById("nombreCliente").value = "";
+        document.getElementById("cedulaCliente").value = "";
+        document.getElementById("lugarExpe").value = "";
+
+        document.getElementById("radicadoProceso").value = "";  
+        document.getElementById("identificado").value = "";  
+        document.getElementById("fechaPresentacion").value = "";  
+
+        document.getElementById("nombreCConciliacion").value = ""; 
+        document.getElementById("fechaAuto").value = "";  
+        document.getElementById("radicadoAuto").value = "";
+
+        document.getElementById("nombrePagador").value = "";   
+        setShowLinkDiv(false);
+    };
+
+    const handleGenerarPDFClick = () => {
+        // Asegúrate de que documentId tenga un valor antes de enviar la solicitud
+        if (!documentId) {
+            console.error("No se encontró el ID del documento. Asegúrate de generar el documento primero."+ documentId);
+            setErrorMessage("No se encontró el ID del documento. Asegúrate de generar el documento primero.");
+            return;
+        }
+    console.log(documentId)
+        google.script.run
+            .withSuccessHandler(response => {
+                console.log("Respuesta del servidor:", response);
+                if (response.success) {
+                    setShowSuccessAlert(true);
+
+                    setTimeout(() => {
+                        setShowSuccessAlert(false);
+                        history.push("/GenerarDocs/Default");
+                    }, 6000);
+                } else {
+                    setErrorMessage(response.message);
+                }
+            })
+            .withFailureHandler(error => {
+                console.error("Error en la comunicación con el servidor:", error);
+                setErrorMessage("Error en la comunicación con el servidor.");
+            })
+            .generarPDFSusProceso({
+                ...formData,
+                documentId: documentId
+            });
+    };
+
+
+    return (
+    <div className=" w-9/12 border-spacing-4 mx-auto">
+        <div className="flex items-center justify-between bg-sky-500 mb-4 ">
+        <h2 className="text-2xl font-bold text-white px-8">ADMISIÓN. MEMORIAL AL JUZGADO DE LA MEDIDA</h2>
+        <h2 className="text-2xl font-bold text-white py-4 bg-rose-600 px-8" onClick={handleGenerarDocClick}>GENERAR DOC</h2>
+        </div>
+            <form className="w-full bg-white p-8 rounded shadow-md border">
+
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE JUZGADO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreJuzgado: e.target.value })} id="nombreJuzgado" placeholder="En donde esta el proceso"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">CORREO JUZGADO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, CorreoJuzgado: e.target.value })} id="CorreoJuzgado" placeholder="mail@mial.com; mail1@mail.com"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE DEL DEMANDANTE</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreDemandante: e.target.value })} id="nombreDemandante" placeholder="nombreDemandante; nombreDemandante1 y nombreDemandante2" />
+                </div>
+            </div>
+                <div className="mb-8">
+                    <label className="block text-sm font-medium text-gray-700 ">NOMBRE DEL DEMANDADOS</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreDemandados: e.target.value })} id="nombreDemandados" placeholder="nombreDemandado; nombreDemandado1 y nombreDemandado2" />
+                </div>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE CLIENTE</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreCliente: e.target.value })} id="nombreCliente"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">CEDULA CLIENTE</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, cedulaCliente: e.target.value })} id="cedulaCliente"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">LUGAR DE EXPEDICIÓN</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, lugarExpe: e.target.value })} id="lugarExpe"/>
+                </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700"># RADICADO PROCESO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, radicadoProceso: e.target.value })} id="radicadoProceso"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">IDENTIFICADO</label>
+                    <select className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, identificado : e.target.value })}  id="identificado">
+                        <option value=""></option>
+                        <option value="identificado">identificado</option>
+                        <option value="identificada">identificada</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">FECHA PRESENTACIÓN INSOLVENCIA</label>
+                    <input type="date" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, fechaPresentacion: e.target.value })} id="fechaPresentacion" />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-4 mt-5">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE C.CONCILIACIÓN</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombreCConciliacion: e.target.value })} id="nombreCConciliacion"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">FECHA AUTO ADMISIÓN</label>
+                    <input type="date" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, fechaAuto: e.target.value })} id="fechaAuto"/>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700"># RADICADO AUTO</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, radicadoAuto: e.target.value })} id="radicadoAuto"/>
+                </div>
+            </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">NOMBRE PAGADOR</label>
+                    <input type="text" className="mt-1 p-2 w-full border rounded-md" onChange={(e) => setFormData({ ...formData, nombrePagador: e.target.value })} id="nombrePagador" placeholder="pagador; pagador1 y pagador2"/>
+                </div>
+        </form>
+
+        {showLinkDiv && (
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-700 bg-opacity-75 flex items-center justify-center">
+            <div className="bg-white p-8 rounded shadow-md border w-1/2 h-auto">
+                <p className="text-2xl font-bold mb-4 text-center text-gray-800">TU DOCUMENTO SE GENERÓ CON ÉXITO</p>
+                <p className="mb-4 text-gray-700">
+                    Recuerda que falta insertar:
+                    <br />
+                    - La imagen de acreedores
+                    <br />
+                    - La imagen de los apartados del resuelve
+                </p>
+                <p className="text-gray-700">
+                Para finalizar con la edición, abre el documento e inserta las imágenes. Luego puedes volver para generar el PDF.
+                </p>
+                <div className="flex justify-around items-center mt-4">
+                    <a href={documentLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline mr-4 font-bold">Abrir Documento</a>
+                    <button onClick={handleGenerarPDFClick} className="px-4 py-2 bg-emerald-800 text-white rounded-md font-bold">Generar PDF</button>
+                    <button onClick={handleCerrarClick} className="px-4 py-2 bg-red-600 text-white rounded-md font-bold">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        )}
+
+        {showSuccessAlert && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong className="font-bold">Éxito!</strong>
+            <span className="block sm:inline tex"> PDF creado. Consulta tu bandeja de borradores.</span>
+            </div>
+        )}
+
+        {errorMessage && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-48" role="alert">
+                <strong className="font-bold">Error!</strong>
+                <span className="block sm:inline text-gray-800"> {errorMessage}</span>
+                </div>
+            )}
+            {loading && (
+                <div className="fixed top-0 left-0 w-full h-full bg-gray-700 bg-opacity-75 flex items-center justify-center">
+    <div className="bg-white p-8 rounded shadow-md border w-1/2 h-auto flex flex-col items-center justify-center">
+            {/* Ícono de serpiente */}
+            <div className="rounded-full h-20 w-20 bg-fuchsia-100 animate-ping mb-4">
+                {/* Reemplaza con tu SVG de serpiente */}
+                <svg className="h-full w-full text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 10l3 3-3 3"></path>
+                    <path d="M19 16v-2a7 7 0 00-14 0v2"></path>
+                </svg>
+            </div>
+
+            {/* Texto */}
+            <span className="text-2xl font-bold text-gray-800">CREANDO DOC ...</span>
+        </div>
+    </div>
+        )}
+    </div>
+    )
+}
+
+
+//</script>

@@ -1,0 +1,105 @@
+//<script type="text/jsx">
+
+function GenerarDocs() {
+    
+return (
+        <div>
+            <div className="flex items-center justify-between   bg-fuchsia-100 p-6 mb-6">
+                <h2 className="text-5xl font-bold text-black"><Link to="/">AtriAPP</Link></h2>
+                <div className="flex items-center space-x-4 p-4  bg-stone-50 rounded-b-lg">
+                    <div className="relative group">
+                        <button className="rounded-lg bg-white text-black p-4 shadow-lg hover:bg-emerald-50 font-bold hover:shadow-inner hover:border border-black mb-2 focus:outline-none">
+                            GERENCIA
+                        </button>
+                        <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-48 z-40 px-2">
+                            <Link to="/GenerarDocs/ConsentimientoInsolvencia"><button className="w-full text-black text-left px-4 py-2 hover:bg-sky-200 hover:border border-black hover:font-bold focus:outline-none ">
+                                CONSENTIMIENTO INSOLVENCIA
+                            </button></Link>
+                            <button className="w-full text-left px-4 py-2 hover:bg-sky-200 hover:border border-black hover:font-bold focus:outline-none ">
+                                Opción 2
+                            </button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <button className="rounded-lg bg-white text-black p-4 shadow-lg hover:bg-emerald-50 font-bold hover:shadow-inner hover:border border-black mb-2 focus:outline-none">
+                            ASOCIADO
+                        </button>
+                        <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-48 z-40 px-2">
+                            <button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                                Opción 1
+                            </button>
+                            <button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                                Opción 2
+                            </button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <button className="rounded-lg bg-white text-black p-4 shadow-lg hover:bg-emerald-50 font-bold hover:shadow-inner hover:border border-black mb-2 focus:outline-none">
+                            ANALISTA
+                        </button>
+                        <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-48 z-40 px-2">
+                            <button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                                Opción 1
+                            </button>
+                            <button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                                Opción 2
+                            </button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <button className="rounded-lg bg-white text-black p-4 shadow-lg hover:bg-emerald-50 font-bold hover:shadow-inner hover:border border-black mb-2 focus:outline-none">
+                            JURIDICA
+                        </button>
+                        <div className="absolute hidden bg-white text-gray-800 border border-gray-300 py-2 rounded-md group-hover:block w-72 z-40 px-2">
+                            <Link to="/GenerarDocs/AdmisionMemorialJuzgadoMedida"><button className="w-full text-left px-4 py-2 hover:bg-emerald-100 hover:border border-black hover:font-bold focus:outline-none ">
+                            ADMISIÓN. MEMORIAL AL JUZGADO DE LA MEDIDA
+                            </button></Link>
+                            <Link to="/GenerarDocs/SolicitudAdmisionAcredor"><button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                            ADMISIÓN. SOLICITUD ACREEDOR
+                            </button></Link>
+                            <Link to="/GenerarDocs/DerechoDePeticionPagador"><button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                            DERECHO DE PETICIÓN PAGADOR
+                            </button></Link>
+                            <Link to="/GenerarDocs/JuzLiquidacion"><button className="w-full text-left px-4 py-2 hover:bg-emerald-100 hover:border border-black hover:font-bold focus:outline-none ">
+                            LIQUIDACIÓN. MEMORIAL AL JUZGADO DE LIQUIDACIÓN
+                            </button></Link>
+                            <Link to="/GenerarDocs/MemorialJuzMedida"><button className="w-full text-left px-4 py-2 hover:bg-emerald-100 hover:border border-black hover:font-bold focus:outline-none ">
+                            LIQUIDACIÓN. MEMORIAL AL JUZGADO DE LA MEDIDA
+                            </button></Link>
+                            <Link to="/GenerarDocs/LiquidacionSolAcredor"><button className="w-full text-left px-4 py-2 hover:bg-emerald-100 hover:border border-black hover:font-bold focus:outline-none ">
+                            LIQUIDACIÓN. SOLICITUD ACREEDOR
+                            </button></Link>
+                            <Link to="/GenerarDocs/liquidacionSolicitudPagador"><button className="w-full text-left px-4 py-2 hover:bg-emerald-100 hover:border border-black hover:font-bold focus:outline-none ">
+                            LIQUIDACIÓN. SOLICITUD PAGADOR
+                            </button></Link>
+                            <Link to="/GenerarDocs/SolicitudVigilancia"><button className="w-full text-left px-4 py-2 hover:bg-emerald-50 hover:border border-black hover:font-bold focus:outline-none ">
+                            SOLICITUD DE VIGILANCIA
+                            </button></Link>
+
+
+
+
+
+                        </div>
+                    </div>     
+                </div>
+                    <h2 className="text-5xl font-bold text-black">GenerarDocs</h2>
+                </div>
+                <div id="contenido-analista" className="p-4">
+                    <Route exact path="/GenerarDocs/Default" component={Default} />
+                    <Route exact path="/GenerarDocs/SolicitudAdmisionAcredor" component={SolicitudAdmisionAcredor} />
+                    <Route exact path="/GenerarDocs/SolicitudVigilancia" component={SolicitudVigilancia} />
+                    <Route exact path="/GenerarDocs/liquidacionSolicitudPagador" component={SolicitudSusLibranzas} />
+                    <Route exact path="/GenerarDocs/AdmisionMemorialJuzgadoMedida" component={AdmisionMemorialJuzgadoMedida} />
+                    <Route exact path="/GenerarDocs/DerechoDePeticionPagador" component={DerechoDePeticionPagador} />
+                    <Route exact path="/GenerarDocs/MemorialJuzMedida" component={MemorialJuzMedida} />
+                    <Route exact path="/GenerarDocs/JuzLiquidacion" component={JuzLiquidacion} />
+                    <Route exact path="/GenerarDocs/LiquidacionSolAcredor" component={LiquidacionSolAcredor} />
+                    <Route exact path="/GenerarDocs/ConsentimientoInsolvencia" component={ConsentimientoInsolvencia} />
+                    <Redirect from="*" to="/GenerarDocs/Default" />
+                </div>
+        </div>
+        
+    );
+    };
+  //</script>

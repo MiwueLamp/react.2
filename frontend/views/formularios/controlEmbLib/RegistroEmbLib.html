@@ -1,0 +1,274 @@
+//<script type="text/jsx">
+function RegistroEmbLib() {
+  const initialState = {
+    NOMBRE: '',
+    ESTADO: '',
+    COMENTARIO: ''
+  };
+
+  const [formulario, setFormulario] = useState(initialState);
+  const [mensajeExito, setMensajeExito] = useState('');
+  const [mensajeError, setMensajeError] = useState('');
+
+  const [pagador, setPagador] = useState('');
+  const [tipoDescuento, setTipoDescuento] = useState('');
+  const [entidadVinculada, setEntidadVinculada] = useState('');
+  const [filas, setFilas] = useState([]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    // Validaciones para el nombre
+    if (name === 'NOMBRE' && /\d/.test(value)) {
+      // Si hay números en el nombre, no actualizamos el estado
+      return;
+    }
+    // Actualizamos el estado solo si las validaciones pasan
+    setFormulario({
+      ...formulario,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validación para evitar enviar el formulario en blanco
+    if (!formulario.NOMBRE && !formulario.ESTADO) {
+      
+      setMensajeError('Por favor, complete al menos un campo antes de enviar el formulario.');
+      return;
+    }
+    guardarEmbLib(formulario);
+    
+  }
+
+  const guardarEmbLib = (datosregJur) => {
+    console.log(datosregJur);
+    // Aquí puedes realizar acciones adicionales, como enviar los datos al servidor.
+    setMensajeError('');
+    setMensajeExito('¡Registro exitoso!');
+
+    setTimeout(() => {
+      setMensajeExito('');
+      setFormulario(initialState);
+    }, 3000); // 3000 milisegundos (3 segundos)
+    const ID = new Date().getTime();
+    google.script.run.withSuccessHandler(resp =>
+      {console.log(resp)
+    }).guardarServidorEmbLib(JSON.stringify({ID,...datosregJur}))
+  };
+
+  const borrarFormularioJur = () => {
+    setFormulario(initialState);
+    setFilas([]); // Restablecer los valores de la tabla
+    setMensajeError(''); // Limpiar el mensaje de error al borrar el formulario
+    setMensajeExito('');
+  };
+
+  const agregarFila = () => {
+    const nuevaFila = {
+      pagador: pagador,
+      tipoDescuento: tipoDescuento,
+      entidadVinculada: entidadVinculada
+    };
+    setFilas([...filas, nuevaFila]);
+    // Limpia los campos después de agregar la fila
+    setPagador('');
+    setTipoDescuento('');
+    setEntidadVinculada('');
+
+    // Hacer scroll hacia abajo
+    setTimeout(() => {
+      const container = document.getElementById("tableContainer");
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }, 100); // Espera 100 milisegundos antes de ajustar el scroll
+  };
+
+  const eliminarFila = (index) => {
+    const nuevasFilas = [...filas];
+    nuevasFilas.splice(index, 1);
+    setFilas(nuevasFilas);
+  };
+
+
+    return (
+<div className=" m-auto w-90 md:w-4/5 lg:w-4/5 xl:w-3/5 drop-shadow-2xl p-6 bg-emerald-600">         
+  <div className="m-auto md:w-full mt-8 p-8 bg-white rounded-md shadow-md w-full">
+        <h2 className="text-2xl font-bold mb-4 text-center">Registro Embargos y Libranzas</h2>
+        <div className="flex justify-center items-center">
+          <svg
+            className="w-20 h-20 text-gray-700 dark:text-gray-300"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 18 20"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 4H1m3 4H1m3 4H1m3 4H1m6.071.286a3.429 3.429 0 1 1 6.858 0M4 1h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Zm9 6.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+            />
+          </svg>
+        </div>
+        {mensajeError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            {mensajeError}
+          </div>
+        )}
+
+        {mensajeExito && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            {mensajeExito}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+        <div className="grid md:grid-cols-2 md:gap-6 my-8">
+          <div>
+            <label htmlFor="nombre" className="block mb-2 text-sm font-medium text-gray-900 ">Nombre Cliente</label>
+              <div className="flex">
+                <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-e-0 border-gray-300 border-e-0 rounded-s-md">
+                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
+                  </svg>
+                </span>
+                <input type="text" 
+                name="NOMBRE"
+                value={formulario.NOMBRE}
+                onChange={handleChange}  id="nombre" 
+                className="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 focus:ring-green-500 focus:border-green-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5 " placeholder="..."
+                required />
+              </div>
+          </div>
+          <div>
+          <label htmlFor="estadoProceso" className="block mb-2 text-sm font-medium text-gray-900 ">Estado Proceso</label>
+              <div className="flex">
+                <select
+                name="ESTADO"
+                value={formulario.ESTADO}
+                onChange={handleChange}
+                required
+                id="estadoProceso" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 ">
+                  <option value=""></option>
+                  <option value="En estructuracion">Libranza</option>
+                  <option value="Estructurado">Estructurado</option>
+                  <option value="Admitido">Admitido</option>
+                </select>
+              </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-1 my-8 w-40 m-auto">
+          <button type="button" onClick={agregarFila} className="inline-flex place-items-center justify-between px-4 md:px-4 py-2 md:py-2.5 text-sm md:text-base font-medium text-center text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:ring-4 focus:outline-none focus:ring-blue-300">
+            Agregar
+            <span className="hidden md:inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 ml-2 text-xs md:text-sm font-semibold text-blue-800 bg-blue-50 rounded-full">
+              +
+            </span>
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-1 md:gap-6 my-4 shadow-xl">
+        <div className="max-h-72 overflow-y-auto" id="tableContainer">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 shadow-xl" id="tableContainer">
+            <thead className="text-sm text-gray-700 uppercase bg-gray-50 sticky top-0 z-10 h-10">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Pagador
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Tipo descuento
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Entidad vinculada
+                </th>
+                <th scope="col" className="px-2 py-3">
+                <svg className="w-6 h-6  text-red-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M5 7h14M5 12h14M5 17h14"/>
+                </svg>
+
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            {filas.map((fila, index) => (
+            <tr key={index} className="bg-white border-b-2 border-gray-100">
+              <td className="font-medium text-gray-900 whitespace-nowrap h-10">
+                <input
+                  type="text"
+                  className="w-full h-full p-4"
+                  value={fila.pagador}
+                  onChange={(e) => {
+                    const nuevasFilas = [...filas];
+                    nuevasFilas[index].pagador = e.target.value;
+                    setFilas(nuevasFilas);
+                  }}
+                />
+              </td>
+              <td className="font-medium text-gray-900 whitespace-nowrap h-10">
+                <select
+                  value={fila.tipoDescuento}
+                  className="w-full h-full p-4"
+                  onChange={(e) => {
+                    const nuevasFilas = [...filas];
+                    nuevasFilas[index].tipoDescuento = e.target.value;
+                    setFilas(nuevasFilas);
+                  }}
+                >
+                  <option value=""></option>
+                  <option value="Libranza">Libranza</option>
+                  <option value="Embargo">Embargo</option>
+                </select>
+              </td>
+              <td className="font-medium text-gray-900 whitespace-nowrap h-10">
+                <input
+                  type="text"
+                  value={fila.entidadVinculada}
+                  className="w-full h-full p-4"
+                  onChange={(e) => {
+                    const nuevasFilas = [...filas];
+                    nuevasFilas[index].entidadVinculada = e.target.value;
+                    setFilas(nuevasFilas);
+                  }}
+                />
+              </td>
+              <td className="px-2 py-3">
+                <button
+                  onClick={() => eliminarFila(index)}
+                  className=" hover:text-red-600"
+                >
+                  <svg className="w-6 h-6 text-red-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z" clipRule="evenodd"/>
+                  </svg>
+
+                </button>
+              </td>
+            </tr>
+          ))}
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <label htmlFor="comentario" className="sr-only">Your message</label>
+          <div className="flex items-center px-3 py-2 rounded-lg bg-gray-100  w-4/5 mx-auto my-10">
+          <svg className="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5h9M5 9h5m8-8H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4l3.5 4 3.5-4h5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
+          </svg>
+              <textarea id="chat" rows="1" className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-200 focus:ring-green-500 focus:border-green-500 " placeholder="Inserte su comentario..."
+                name="COMENTARIO"
+                value={formulario.COMENTARIO}
+                onChange={handleChange}
+                ></textarea>
+          </div>
+          <div className="flex justify-between">
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-600">Registrar</button>
+            <button type="button" onClick={borrarFormularioJur} className="bg-rose-600 text-white px-4 py-2 rounded-md hover:bg-rose-700 focus:outline-none">Borrar</button>
+          </div>
+        </form>
+      </div>
+</div>
+    );
+}
+
+//</script>
